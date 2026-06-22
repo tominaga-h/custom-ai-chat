@@ -1,0 +1,222 @@
+:root {
+  --bg: #1a1a1a;
+  --bg-elev: #242424;
+  --bg-user: #2f6fed;
+  --bg-assistant: #2a2a2a;
+  --text: #ececec;
+  --text-dim: #9a9a9a;
+  --border: #3a3a3a;
+  --accent: #2f6fed;
+  --radius: 14px;
+  --maxw: 760px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans",
+    "Noto Sans JP", sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* --- Top bar --- */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.brand {
+  font-weight: 600;
+}
+
+.meta {
+  flex: 1;
+  color: var(--text-dim);
+  font-size: 13px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ghost {
+  background: transparent;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.ghost:hover {
+  color: var(--text);
+  border-color: var(--text-dim);
+}
+
+/* --- Thread --- */
+.thread {
+  flex: 1;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  padding: 24px 16px 8px;
+}
+
+.empty {
+  max-width: var(--maxw);
+  margin: 12vh auto 0;
+  text-align: center;
+  color: var(--text-dim);
+}
+
+.empty h1 {
+  color: var(--text);
+  font-size: 26px;
+  margin-bottom: 8px;
+}
+
+.empty code {
+  background: var(--bg-elev);
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.msg {
+  max-width: var(--maxw);
+  margin: 0 auto 18px;
+  display: flex;
+  gap: 12px;
+}
+
+.msg .role {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 700;
+  user-select: none;
+}
+
+.msg.user .role {
+  background: var(--bg-user);
+  color: #fff;
+}
+
+.msg.assistant .role {
+  background: var(--bg-assistant);
+  border: 1px solid var(--border);
+}
+
+.msg .bubble {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-top: 3px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+}
+
+.msg.error .bubble {
+  color: #ff8a8a;
+}
+
+/* blinking cursor while streaming */
+.bubble.streaming::after {
+  content: "▋";
+  margin-left: 2px;
+  color: var(--text-dim);
+  animation: blink 1s steps(2, start) infinite;
+}
+
+@keyframes blink {
+  to {
+    visibility: hidden;
+  }
+}
+
+/* --- Composer --- */
+.composer {
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+  padding: 12px 16px 18px;
+}
+
+.composer-inner {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 8px 8px 14px;
+}
+
+.composer-inner:focus-within {
+  border-color: var(--accent);
+}
+
+#input {
+  flex: 1;
+  min-width: 0;
+  resize: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  /* progressive enhancement: grows with content */
+  field-sizing: content;
+  height: auto;
+  min-block-size: 1lh;
+  max-block-size: 10lh;
+  overflow-y: auto;
+}
+
+#input::placeholder {
+  color: var(--text-dim);
+}
+
+#send {
+  flex: 0 0 auto;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#send:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* --- field-sizing fallback (Firefox etc.) --- */
+@supports not (field-sizing: content) {
+  #input {
+    overflow-y: hidden;
+  }
+}

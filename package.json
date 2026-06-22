@@ -1,0 +1,14 @@
+{
+  "name": "custom-ai-chat",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "ChatGPT-like chat UI for any OpenAI-compatible API (Sakana Fugu, etc.)",
+  "scripts": {
+    "start": "node --env-file=.env src/server.ts",
+    "dev": "node --env-file=.env --watch src/server.ts"
+  },
+  "engines": {
+    "node": ">=22.6.0"
+  }
+}
