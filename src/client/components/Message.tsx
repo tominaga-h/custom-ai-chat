@@ -1,5 +1,6 @@
 import type { DisplayMessage } from "../types.ts";
 import { Markdown } from "./Markdown.tsx";
+import { Spinner } from "./Spinner.tsx";
 
 const ROLE_BADGE: Record<DisplayMessage["role"], string> = {
   user: "You",
@@ -11,6 +12,8 @@ export function Message({ message }: { message: DisplayMessage }) {
   const badge = message.error ? "!" : ROLE_BADGE[message.role];
   // アシスタントの応答だけ Markdown 描画。ユーザー入力・エラーはプレーンテキスト。
   const asMarkdown = message.role === "assistant" && !message.error;
+  // まだ最初のトークンが届く前（content が空でストリーミング中）は「考え中…」を表示。
+  const thinking = message.streaming && message.content.length === 0;
 
   return (
     <div className="mx-auto mb-[18px] flex max-w-[760px] gap-3">
@@ -31,8 +34,17 @@ export function Message({ message }: { message: DisplayMessage }) {
           message.error ? "text-[#ff8a8a]" : "",
         ].join(" ")}
       >
-        {asMarkdown ? <Markdown>{message.content}</Markdown> : message.content}
-        {message.streaming && <span className="streaming-cursor" aria-hidden="true" />}
+        {thinking ? (
+          <span className="text-text-dim flex items-center gap-2">
+            <Spinner />
+            考え中…
+          </span>
+        ) : (
+          <>
+            {asMarkdown ? <Markdown>{message.content}</Markdown> : message.content}
+            {message.streaming && <span className="streaming-cursor" aria-hidden="true" />}
+          </>
+        )}
       </div>
     </div>
   );
