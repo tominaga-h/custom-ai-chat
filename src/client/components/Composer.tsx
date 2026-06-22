@@ -34,7 +34,7 @@ export function Composer({
         submit();
       }}
     >
-      <div className="bg-bg-elev border-border-soft focus-within:border-accent mx-auto flex max-w-[760px] items-end gap-[10px] rounded-[14px] border py-2 pr-2 pl-[14px]">
+      <div className="bg-bg-elev border-border-soft focus-within:border-accent mx-auto flex max-w-[760px] items-center gap-[10px] rounded-[14px] border py-2 pr-2 pl-[14px]">
         <textarea
           ref={taRef}
           className="autosize text-text-main max-h-[10lh] min-h-[1lh] min-w-0 flex-1 resize-none border-none bg-transparent outline-none placeholder:text-text-dim"
