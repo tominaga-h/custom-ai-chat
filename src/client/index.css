@@ -1,14 +1,47 @@
 @import "tailwindcss";
 
-/* ChatGPT風ダークテーマのトークン（旧 styles.css の配色を継承） */
+/* テーマトークンを @theme に登録（ユーティリティ bg-bg / text-text-main 等を生成）。
+   実際の色値は下の :root / .light で切り替えるため、ここでは参照だけ張る。
+   @theme で var() を初期値に使うと Tailwind が変数を inline せずユーティリティが
+   var(--color-*) を参照し続けるので、ルート側の上書きがそのまま効く。 */
 @theme {
-  --color-bg: #1a1a1a;
-  --color-bg-elev: #242424;
-  --color-bg-assistant: #2a2a2a;
-  --color-border-soft: #3a3a3a;
-  --color-text-main: #ececec;
-  --color-text-dim: #9a9a9a;
-  --color-accent: #2f6fed;
+  --color-bg: var(--bg);
+  --color-bg-elev: var(--bg-elev);
+  --color-bg-assistant: var(--bg-assistant);
+  --color-border-soft: var(--border-soft);
+  --color-text-main: var(--text-main);
+  --color-text-dim: var(--text-dim);
+  --color-accent: var(--accent);
+  --color-danger: var(--danger);
+  --color-overlay: var(--overlay);
+}
+
+/* ダークテーマ（既定）— 旧 styles.css の配色を継承 */
+:root {
+  --bg: #1a1a1a;
+  --bg-elev: #242424;
+  --bg-assistant: #2a2a2a;
+  --border-soft: #3a3a3a;
+  --text-main: #ececec;
+  --text-dim: #9a9a9a;
+  --accent: #2f6fed;
+  --danger: #ff8a8a;
+  --overlay: rgb(0 0 0 / 0.6);
+  color-scheme: dark;
+}
+
+/* ライトテーマ */
+.light {
+  --bg: #ffffff;
+  --bg-elev: #f4f4f5;
+  --bg-assistant: #f7f7f8;
+  --border-soft: #e2e2e5;
+  --text-main: #1f1f1f;
+  --text-dim: #6b6b70;
+  --accent: #2f6fed;
+  --danger: #c0392b;
+  --overlay: rgb(0 0 0 / 0.4);
+  color-scheme: light;
 }
 
 html,

@@ -115,7 +115,7 @@ export function ImportModal({
         aria-label="インポートする履歴 JSON"
         spellCheck={false}
       />
-      {error && <p className="text-[13px] text-[#ff8a8a]">{error}</p>}
+      {error && <p className="text-danger text-[13px]">{error}</p>}
     </Modal>
   );
 }

@@ -31,7 +31,7 @@ export function Message({ message }: { message: DisplayMessage }) {
         className={[
           "min-w-0 flex-1 pt-[3px] break-words [overflow-wrap:anywhere]",
           asMarkdown ? "" : "whitespace-pre-wrap",
-          message.error ? "text-[#ff8a8a]" : "",
+          message.error ? "text-danger" : "",
         ].join(" ")}
       >
         {thinking ? (
