@@ -1,4 +1,5 @@
 import type { DisplayMessage } from "../types.ts";
+import { Markdown } from "./Markdown.tsx";
 
 const ROLE_BADGE: Record<DisplayMessage["role"], string> = {
   user: "You",
@@ -8,6 +9,8 @@ const ROLE_BADGE: Record<DisplayMessage["role"], string> = {
 export function Message({ message }: { message: DisplayMessage }) {
   const isUser = message.role === "user";
   const badge = message.error ? "!" : ROLE_BADGE[message.role];
+  // アシスタントの応答だけ Markdown 描画。ユーザー入力・エラーはプレーンテキスト。
+  const asMarkdown = message.role === "assistant" && !message.error;
 
   return (
     <div className="mx-auto mb-[18px] flex max-w-[760px] gap-3">
@@ -23,12 +26,13 @@ export function Message({ message }: { message: DisplayMessage }) {
       </div>
       <div
         className={[
-          "min-w-0 flex-1 pt-[3px] break-words whitespace-pre-wrap [overflow-wrap:anywhere]",
+          "min-w-0 flex-1 pt-[3px] break-words [overflow-wrap:anywhere]",
+          asMarkdown ? "" : "whitespace-pre-wrap",
           message.error ? "text-[#ff8a8a]" : "",
-          message.streaming ? "streaming-cursor" : "",
         ].join(" ")}
       >
-        {message.content}
+        {asMarkdown ? <Markdown>{message.content}</Markdown> : message.content}
+        {message.streaming && <span className="streaming-cursor" aria-hidden="true" />}
       </div>
     </div>
   );

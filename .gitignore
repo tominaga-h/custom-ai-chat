@@ -3,3 +3,5 @@ node_modules/
 dist/
 *.tsbuildinfo
 *.log
+.playwright-mcp/
+markdown-render.png
