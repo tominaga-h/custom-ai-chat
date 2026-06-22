@@ -1,9 +1,10 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
-import { readFile } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
-import { dirname, join } from "node:path";
+import { dirname, join, normalize } from "node:path";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const DIST = join(__dirname, "..", "dist");
 
 const BASE_URL = (process.env.BASE_URL ?? "").replace(/\/+$/, "");
 const MODEL = process.env.MODEL ?? "";
@@ -85,12 +86,53 @@ async function handleChat(req: IncomingMessage, res: ServerResponse): Promise<vo
   }
 }
 
-const STATIC: Record<string, { file: string; type: string }> = {
-  "/": { file: "index.html", type: "text/html; charset=utf-8" },
-  "/index.html": { file: "index.html", type: "text/html; charset=utf-8" },
-  "/app.js": { file: "app.js", type: "text/javascript; charset=utf-8" },
-  "/styles.css": { file: "styles.css", type: "text/css; charset=utf-8" },
+const MIME: Record<string, string> = {
+  ".html": "text/html; charset=utf-8",
+  ".js": "text/javascript; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".json": "application/json; charset=utf-8",
+  ".svg": "image/svg+xml",
+  ".ico": "image/x-icon",
+  ".woff2": "font/woff2",
 };
+
+/** Vite ビルド成果物(dist/)を配信。無ければ index.html へフォールバック(SPA)。 */
+async function serveStatic(url: string, res: ServerResponse): Promise<void> {
+  const rel = url === "/" ? "/index.html" : url;
+  // ディレクトリトラバーサル対策
+  const filePath = normalize(join(DIST, rel));
+  if (!filePath.startsWith(DIST)) {
+    send(res, 403, "Forbidden", "text/plain; charset=utf-8");
+    return;
+  }
+
+  try {
+    const info = await stat(filePath);
+    if (info.isFile()) {
+      const body = await readFile(filePath);
+      const ext = filePath.slice(filePath.lastIndexOf("."));
+      res.writeHead(200, { "Content-Type": MIME[ext] ?? "application/octet-stream" });
+      res.end(body);
+      return;
+    }
+  } catch {
+    // fall through
+  }
+
+  // SPA フォールバック
+  try {
+    const body = await readFile(join(DIST, "index.html"));
+    res.writeHead(200, { "Content-Type": MIME[".html"] });
+    res.end(body);
+  } catch {
+    send(
+      res,
+      404,
+      "dist/ が見つかりません。先に `npm run build` を実行するか、開発時は `npm run dev` を使ってください。",
+      "text/plain; charset=utf-8",
+    );
+  }
+}
 
 const server = createServer(async (req, res) => {
   const url = (req.url ?? "/").split("?")[0];
@@ -112,15 +154,8 @@ const server = createServer(async (req, res) => {
     return;
   }
 
-  const asset = STATIC[url];
-  if (req.method === "GET" && asset) {
-    try {
-      const body = await readFile(join(__dirname, "public", asset.file));
-      res.writeHead(200, { "Content-Type": asset.type });
-      res.end(body);
-    } catch {
-      send(res, 404, "Not Found", "text/plain; charset=utf-8");
-    }
+  if (req.method === "GET") {
+    await serveStatic(url, res);
     return;
   }
 

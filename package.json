@@ -5,10 +5,28 @@
   "type": "module",
   "description": "ChatGPT-like chat UI for any OpenAI-compatible API (Sakana Fugu, etc.)",
   "scripts": {
-    "start": "node --env-file=.env src/server.ts",
-    "dev": "node --env-file=.env --watch src/server.ts"
+    "dev": "node --env-file=.env src/server.ts & vite",
+    "dev:api": "node --env-file=.env --watch src/server.ts",
+    "dev:web": "vite",
+    "build": "tsc -b && vite build",
+    "start": "vite build && node --env-file=.env src/server.ts",
+    "typecheck": "tsc -b --noEmit"
   },
   "engines": {
     "node": ">=22.6.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.1",
+    "@types/node": "^26.0.0",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.2",
+    "tailwindcss": "^4.3.1",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.16"
+  },
+  "dependencies": {
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
   }
 }

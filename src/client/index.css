@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+/* ChatGPT風ダークテーマのトークン（旧 styles.css の配色を継承） */
+@theme {
+  --color-bg: #1a1a1a;
+  --color-bg-elev: #242424;
+  --color-bg-assistant: #2a2a2a;
+  --color-border-soft: #3a3a3a;
+  --color-text-main: #ececec;
+  --color-text-dim: #9a9a9a;
+  --color-accent: #2f6fed;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text-main);
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* ストリーミング中の点滅カーソル */
+@keyframes blink {
+  to {
+    visibility: hidden;
+  }
+}
+.streaming-cursor::after {
+  content: "▋";
+  margin-left: 2px;
+  color: var(--color-text-dim);
+  animation: blink 1s steps(2, start) infinite;
+}
+
+/* textarea: 入力に合わせて伸縮（field-sizing 対応ブラウザ） */
+.autosize {
+  field-sizing: content;
+}
