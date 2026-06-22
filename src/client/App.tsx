@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Menu, Moon, Sun } from "lucide-react";
 import { useChat } from "./useChat.ts";
 import { useTheme } from "./useTheme.ts";
 import { useMenu } from "./useMenu.ts";
@@ -59,9 +60,9 @@ export default function App() {
           onClick={toggleTheme}
           aria-label={theme === "dark" ? "ライトテーマに切り替え" : "ダークテーマに切り替え"}
           title={theme === "dark" ? "ライトテーマに切り替え" : "ダークテーマに切り替え"}
-          className="text-text-dim border-border-soft hover:text-text-main hover:border-text-dim flex-none rounded-lg border bg-transparent px-3 py-1.5 text-[13px]"
+          className="text-text-dim border-border-soft hover:text-text-main hover:border-text-dim flex-none rounded-lg border bg-transparent p-2"
         >
-          {theme === "dark" ? "☀️" : "🌙"}
+          {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
         </button>
 
         {/* 広い画面: 横並びでそのまま表示 */}
@@ -83,9 +84,9 @@ export default function App() {
             aria-label="メニュー"
             aria-expanded={menu.open}
             title="メニュー"
-            className="text-text-dim border-border-soft hover:text-text-main hover:border-text-dim aria-expanded:text-text-main aria-expanded:border-text-dim rounded-lg border bg-transparent px-3 py-1.5 text-base leading-none"
+            className="text-text-dim border-border-soft hover:text-text-main hover:border-text-dim aria-expanded:text-text-main aria-expanded:border-text-dim rounded-lg border bg-transparent p-2"
           >
-            ☰
+            <Menu size={16} />
           </button>
           {menu.open && (
             <div className="bg-bg-elev border-border-soft absolute top-[calc(100%+8px)] right-0 z-50 flex w-44 flex-col gap-1 rounded-lg border p-1.5 shadow-xl">
