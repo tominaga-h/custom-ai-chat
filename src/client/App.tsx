@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useChat } from "./useChat.ts";
 import { Message } from "./components/Message.tsx";
 import { Composer } from "./components/Composer.tsx";
+import { ExportModal, ImportModal } from "./components/HistoryModals.tsx";
 import type { ServerConfig } from "./types.ts";
 
 function useConfigLabel(): string {
@@ -20,9 +21,11 @@ function useConfigLabel(): string {
 }
 
 export default function App() {
-  const { messages, busy, send, clear } = useChat();
+  const { messages, busy, send, clear, exportHistory, importHistory } = useChat();
   const configLabel = useConfigLabel();
   const threadRef = useRef<HTMLDivElement>(null);
+  // null = 閉じている / "export" | "import" = 表示中のモーダル
+  const [modal, setModal] = useState<null | "export" | "import">(null);
 
   // 新規メッセージ / ストリーミング更新のたびに最下部へ
   useEffect(() => {
@@ -40,6 +43,21 @@ export default function App() {
         >
           {configLabel}
         </div>
+        <button
+          type="button"
+          onClick={() => setModal("export")}
+          className="text-text-dim border-border-soft hover:text-text-main hover:border-text-dim rounded-lg border bg-transparent px-3 py-1.5 text-[13px]"
+        >
+          エクスポート
+        </button>
+        <button
+          type="button"
+          onClick={() => setModal("import")}
+          disabled={busy}
+          className="text-text-dim border-border-soft hover:text-text-main hover:border-text-dim rounded-lg border bg-transparent px-3 py-1.5 text-[13px] disabled:opacity-45"
+        >
+          インポート
+        </button>
         <button
           type="button"
           onClick={clear}
@@ -65,6 +83,13 @@ export default function App() {
       </main>
 
       <Composer busy={busy} onSend={send} />
+
+      {modal === "export" && (
+        <ExportModal json={exportHistory()} onClose={() => setModal(null)} />
+      )}
+      {modal === "import" && (
+        <ImportModal onImport={importHistory} onClose={() => setModal(null)} />
+      )}
     </div>
   );
 }

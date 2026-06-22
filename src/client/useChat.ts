@@ -1,8 +1,51 @@
 import { useCallback, useRef, useState } from "react";
-import type { ChatMessage, DisplayMessage } from "./types.ts";
+import type { ChatMessage, DisplayMessage, Role } from "./types.ts";
 
 let idCounter = 0;
 const nextId = () => `m${++idCounter}`;
+
+const isRole = (v: unknown): v is Role => v === "user" || v === "assistant";
+
+/**
+ * import された JSON 文字列を ChatMessage[] に検証付きで変換する。
+ * 受け付ける形: `{ "messages": [...] }`（export 形式）または素の配列 `[...]`。
+ * 不正な場合は理由を添えて throw する。
+ */
+function parseHistory(json: string): ChatMessage[] {
+  let data: unknown;
+  try {
+    data = JSON.parse(json);
+  } catch {
+    throw new Error("JSON の形式が不正です。");
+  }
+
+  const raw: unknown = Array.isArray(data)
+    ? data
+    : data && typeof data === "object" && "messages" in data
+      ? (data as { messages: unknown }).messages
+      : undefined;
+
+  if (!Array.isArray(raw)) {
+    throw new Error('messages 配列が見つかりません（{ "messages": [...] } 形式が必要です）。');
+  }
+
+  const result: ChatMessage[] = [];
+  raw.forEach((item, i) => {
+    if (!item || typeof item !== "object") {
+      throw new Error(`${i + 1} 番目の要素がオブジェクトではありません。`);
+    }
+    const { role, content } = item as { role?: unknown; content?: unknown };
+    if (!isRole(role)) {
+      throw new Error(`${i + 1} 番目の role が不正です（"user" か "assistant"）。`);
+    }
+    if (typeof content !== "string") {
+      throw new Error(`${i + 1} 番目の content が文字列ではありません。`);
+    }
+    result.push({ role, content });
+  });
+
+  return result;
+}
 
 /**
  * /api/chat に履歴を投げ、SSE で返る delta を逐次 state に反映するフック。
@@ -105,5 +148,31 @@ export function useChat() {
     setMessages([]);
   }, [busy]);
 
-  return { messages, busy, send, clear };
+  /** 確定済みの履歴を export 形式の整形済み JSON 文字列で返す。 */
+  const exportHistory = useCallback(
+    () => JSON.stringify({ messages: historyRef.current }, null, 2),
+    [],
+  );
+
+  /**
+   * JSON 文字列を検証して現在のセッションの末尾に追加する。
+   * 検証に失敗したら throw（呼び出し側でエラー表示）。成功時は追加件数を返す。
+   */
+  const importHistory = useCallback(
+    (json: string): number => {
+      if (busy) throw new Error("応答の生成中はインポートできません。");
+      const incoming = parseHistory(json);
+      if (incoming.length === 0) return 0;
+
+      historyRef.current = [...historyRef.current, ...incoming];
+      setMessages((prev) => [
+        ...prev,
+        ...incoming.map((m) => ({ ...m, id: nextId() }) satisfies DisplayMessage),
+      ]);
+      return incoming.length;
+    },
+    [busy],
+  );
+
+  return { messages, busy, send, clear, exportHistory, importHistory };
 }
